@@ -25,7 +25,11 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "bulma/css/bulma.css",
+              "@fortawesome/fontawesome-free/css/all.css",
+              "src/styles/index.scss"
+            ],
             "scripts": []
           },
           "configurations": {
