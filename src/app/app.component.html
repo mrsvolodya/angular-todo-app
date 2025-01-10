@@ -8,81 +8,24 @@
         class="todoapp__toggle-all active"
         data-cy="ToggleAllButton"
       ></button>
-
-      <form (ngSubmit)="addTodo()">
-        <input
-          data-cy="NewTodoField"
-          type="text"
-          class="todoapp__new-todo"
-          placeholder="What needs to be done?"
-          name="title"
-          [(ngModel)]="title"
-        />
-      </form>
+      <app-todo-form (save)="addTodo($event)"></app-todo-form>
     </header>
 
     <section class="todoapp__main" data-cy="TodoList">
-      <!-- This is a completed todo -->
-      <div
-        data-cy="Todo"
-        class="todo"
-        [class]="{ completed: todo.completed }"
-        *ngFor="let todo of todos; let i = index"
-      >
-        <label class="todo__status-label">
-          <input
-            data-cy="TodoStatus"
-            type="checkbox"
-            class="todo__status"
-            [(ngModel)]="todo.completed"
-          />
-        </label>
-
-        <form *ngIf="editing; else titleBlock">
-          <input
-            data-cy="TodoTitleField"
-            type="text"
-            class="todo__title-field"
-            placeholder="Empty todo will be deleted"
-            value="Todo is being edited now"
-          />
-        </form>
-
-        <ng-template #titleBlock>
-          <span data-cy="TodoTitle" class="todo__title">
-            {{ todo.title }}
-          </span>
-
-          <button
-            type="button"
-            class="todo__remove"
-            data-cy="TodoDelete"
-            (click)="todos.splice(i, 1)"
-          >
-            ×
-          </button>
-        </ng-template>
-
-        <div
-          data-cy="TodoLoader"
-          className="modal overlay"
-          [class.is-active]="true"
-        >
-          <div className="modal-background has-background-white-ter"></div>
-          <div className="loader"></div>
-        </div>
-      </div>
-
-      <!-- This todo is in loadind state -->
+      <app-todo
+        *ngFor="let todo of todos; let i = index; trackBy: trackById"
+        [todo]="todo"
+        (delete)="deleteTodo(todo.id)"
+        (rename)="renameTodo(todo.id, $event)"
+        (toggle)="toggleTodo(todo.id)"
+      ></app-todo>
     </section>
 
-    <!-- Hide the footer if there are no todos -->
     <footer class="todoapp__footer" data-cy="Footer">
       <span class="todo-count" data-cy="TodosCounter">
         {{ activeTodos.length }} items left
       </span>
 
-      <!-- Active link should have the 'selected' class -->
       <nav class="filter" data-cy="Filter">
         <a href="#/" class="filter__link selected" data-cy="FilterLinkAll">
           All
@@ -101,7 +44,6 @@
         </a>
       </nav>
 
-      <!-- this button should be disabled if there are no completed todos -->
       <button
         type="button"
         class="todoapp__clear-completed"
