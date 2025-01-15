@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  AfterViewChecked,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -41,7 +40,6 @@ export class TodoComponent implements OnChanges {
 
   constructor() {}
   ngOnChanges({ todo }: SimpleChanges): void {
-    console.log(todo.previousValue);
     if (todo.currentValue.title !== todo.previousValue?.title) {
       this.title = todo.currentValue.title;
     }

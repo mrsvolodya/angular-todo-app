@@ -4,14 +4,10 @@ import { CommonModule } from '@angular/common';
 import { TodoComponent } from './components/todo/todo.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TodoFormComponent } from './components/todo-form/todo-form.component';
-
-const todosFromServer = [
-  { id: 1, title: '123', completed: true },
-  { id: 2, title: '1234', completed: false },
-  { id: 3, title: '12345', completed: false },
-  { id: 4, title: '123456', completed: false },
-];
-
+import { TodosService } from './services/todos.service';
+import { HttpClientModule } from '@angular/common/http';
+import { MessageComponent } from './components/message/message.component';
+import { MessageService } from './services/message.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,13 +17,16 @@ const todosFromServer = [
     ReactiveFormsModule,
     TodoComponent,
     TodoFormComponent,
+    HttpClientModule,
+    MessageComponent,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   _todos: Todo[] = [];
   activeTodos: Todo[] = [];
+  errorMessage: string = '';
 
   get todos() {
     return this._todos;
@@ -40,45 +39,48 @@ export class AppComponent implements OnInit {
     this.activeTodos = this._todos.filter((todo) => !todo.completed);
   }
 
+  constructor(
+    private todosService: TodosService,
+    private messageService: MessageService
+  ) {}
+
   ngOnInit(): void {
-    this.todos = todosFromServer;
+    this.todosService.todos$.subscribe((todos) => {
+      this.todos = todos;
+    });
+    this.todosService.loadTodos().subscribe({
+      next: (data: Todo[]) => {
+        this.todos = data;
+      },
+      error: () => this.messageService.showMessage('Failed to load todos'),
+    });
   }
 
-  trackById(i: number, todo: Todo) {
-    return todo.id;
-  }
+  trackById = (i: number, todo: Todo) => todo.id;
 
   addTodo(newTitle: string) {
-    const newTodo: Todo = {
-      id: this.todos.length + 1,
-      title: newTitle,
-      completed: false,
-    };
-
-    this.todos = [...this.todos, newTodo];
-  }
-
-  renameTodo(todoId: number, title: string) {
-    this.todos = this.todos.map((todo) => {
-      if (todo.id !== todoId) {
-        return todo;
-      }
-
-      return { ...todo, title };
+    this.todosService.createTodo(newTitle).subscribe({
+      error: () => this.messageService.showMessage('Uable to add a todo'),
     });
   }
 
-  toggleTodo(todoId: number) {
-    this.todos = this.todos.map((todo) => {
-      if (todo.id !== todoId) {
-        return todo;
-      }
-
-      return { ...todo, completed: !todo.completed };
+  renameTodo(todo: Todo, title: string) {
+    this.todosService.updateTodo({ ...todo, title }).subscribe({
+      error: () => this.messageService.showMessage('Unable to rename todo'),
     });
   }
 
-  deleteTodo(todoId: number) {
-    this.todos = this.todos.filter((todo) => todo.id !== todoId);
+  toggleTodo(todo: Todo) {
+    this.todosService
+      .updateTodo({ ...todo, completed: !todo.completed })
+      .subscribe({
+        error: () => this.messageService.showMessage('Unable to toggle a todo'),
+      });
+  }
+
+  deleteTodo(todo: Todo) {
+    this.todosService.deleteTodo(todo).subscribe({
+      error: () => this.messageService.showMessage('Unable to delete a todo'),
+    });
   }
 }
