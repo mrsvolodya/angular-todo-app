@@ -10,7 +10,7 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrl: './message.component.scss',
 })
 export class MessageComponent implements OnInit, OnDestroy {
-  // @Input() title = 'Error';
+  @Input() title = 'Error';
 
   message = '';
   hidden = true;
