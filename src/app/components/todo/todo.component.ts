@@ -34,6 +34,7 @@ export class TodoComponent implements OnChanges {
       field.nativeElement.focus();
     }
   }
+  
 
   editing = false;
   title = '';

@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MessageService {
-  private message$$ = new Subject<string>();
-
+  public message$$ = new Subject<string>();
   message$ = this.message$$.asObservable();
 
   showMessage(text: string) {

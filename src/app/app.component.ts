@@ -8,6 +8,7 @@ import { TodosService } from './services/todos.service';
 import { HttpClientModule } from '@angular/common/http';
 import { MessageComponent } from './components/message/message.component';
 import { MessageService } from './services/message.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -45,13 +46,12 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.todosService.todos$.subscribe((todos) => {
-      this.todos = todos;
+    this.todosService.todos$.subscribe({
+      next: (todos: Todo[]) => {
+        this.todos = todos;
+      },
     });
     this.todosService.loadTodos().subscribe({
-      next: (data: Todo[]) => {
-        this.todos = data;
-      },
       error: () => this.messageService.showMessage('Failed to load todos'),
     });
   }

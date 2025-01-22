@@ -1,6 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MessageService } from '../../services/message.service';
-import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-message',
@@ -9,28 +8,16 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
 })
-export class MessageComponent implements OnInit, OnDestroy {
-  @Input() title = 'Error';
-
-  message = '';
+export class MessageComponent implements OnInit {
+  title = 'Error';
   hidden = true;
-  destroy$$ = new Subject();
-
-  constructor(private messageService: MessageService) {}
-
-  ngOnDestroy(): void {
-    this.destroy$$.next(null);
-    this.destroy$$.complete();
-  }
+  message = '';
+  constructor(public messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.messageService.message$
-      .pipe(takeUntil(this.destroy$$))
-      .subscribe((text) => {
-        console.log(2);
-
-        this.hidden = false;
-        this.message = text;
-      });
+    this.messageService.message$.subscribe((text) => {
+      this.message = text;
+      this.hidden = false;
+    });
   }
 }
