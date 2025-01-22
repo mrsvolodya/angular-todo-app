@@ -3,7 +3,11 @@ import { TodosPageComponent } from './pages/todos-page/todos-page.component';
 import { AboutPageComponent } from './about/about-page/about-page.component';
 export const routes: Routes = [
   { path: 'todos', component: TodosPageComponent },
-  { path: 'about', component: AboutPageComponent },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./pages/about/about.component').then((m) => m.AboutComponent),
+  },
   {
     path: '',
     redirectTo: '/todos',
