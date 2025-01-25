@@ -10,7 +10,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   imports: [
     CommonModule,
     HttpClientModule,
-    TodosPageComponent,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,

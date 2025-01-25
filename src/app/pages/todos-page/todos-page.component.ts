@@ -7,6 +7,10 @@ import { TodoFormComponent } from '../../components/todo-form/todo-form.componen
 import { TodoComponent } from '../../components/todo/todo.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { distinctUntilChanged, filter, map, switchMap } from 'rxjs';
+import { FilterComponent } from '../../components/filter/filter.component';
+import { ActivatedRoute } from '@angular/router';
+import { Params } from '../../types/params';
 
 @Component({
   selector: 'app-todos-page',
@@ -18,37 +22,44 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
+    FilterComponent,
   ],
   templateUrl: './todos-page.component.html',
   styleUrl: './todos-page.component.scss',
 })
 export class TodosPageComponent {
-  _todos: Todo[] = [];
-  activeTodos: Todo[] = [];
-  errorMessage: string = '';
-
-  get todos() {
-    return this._todos;
-  }
-
-  set todos(todos: Todo[]) {
-    if (todos === this._todos) return;
-
-    this._todos = todos;
-    this.activeTodos = this._todos.filter((todo) => !todo.completed);
-  }
-
   constructor(
     private todosService: TodosService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute
   ) {}
 
+  todos$ = this.todosService.todos$;
+  activeTodos$ = this.todos$.pipe(
+    distinctUntilChanged(),
+    map((todos) => todos.filter((todo) => !todo.completed))
+  );
+  completedTodos$ = this.todos$.pipe(
+    map((todos) => todos.filter((todo) => todo.completed))
+  );
+  activeCount$ = this.activeTodos$.pipe(map((todos) => todos.length));
+  errorMessage: string = '';
+
+  visibleTodos = this.route.params.pipe(
+    switchMap((params) => {
+      switch (params['status'] as Params) {
+        case 'active':
+          return this.activeTodos$;
+        case 'completed':
+          return this.completedTodos$;
+        default:
+          return this.todos$;
+      }
+    })
+  );
+
   ngOnInit(): void {
-    this.todosService.todos$.subscribe({
-      next: (todos: Todo[]) => {
-        this.todos = todos;
-      },
-    });
+    this.route.params.subscribe();
     this.todosService.loadTodos().subscribe({
       error: () => this.messageService.showMessage('Failed to load todos'),
     });

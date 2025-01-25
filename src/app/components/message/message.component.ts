@@ -15,7 +15,8 @@ export class MessageComponent implements OnInit {
   constructor(public messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.messageService.message$.subscribe((text) => {
+    this.messageService.message$
+    .subscribe((text) => {
       this.message = text;
       this.hidden = false;
     });

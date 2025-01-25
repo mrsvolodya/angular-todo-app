@@ -1,8 +1,9 @@
-<nav class="filter">
+<nav class="filter" data-cy="Filter">
   <a
     routerLink="/todos/all"
     routerLinkActive="selected"
     class="filter__link"
+    data-cy="FilterLinkAll"
   >
     All
   </a>
@@ -11,6 +12,7 @@
     routerLink="/todos/active"
     routerLinkActive="selected"
     class="filter__link"
+    data-cy="FilterLinkActive"
   >
     Active
   </a>
@@ -19,6 +21,7 @@
     routerLink="/todos/completed"
     routerLinkActive="selected"
     class="filter__link"
+    data-cy="FilterLinkCompleted"
   >
     Completed
   </a>
